@@ -68,6 +68,7 @@ type ImagingTransformMap func(x, y float64, data []float64) (xout, yout float64)
 func genericTransform(img image.Image, outImage *image.NRGBA, x0, y0, x1, y1 float64, transform ImagingTransformMap, data []float64, filter ResampleFilter) {
 	srcW := img.Bounds().Dx()
 	srcH := img.Bounds().Dy()
+
 	if srcW <= 0 || srcH <= 0 {
 		return
 	}
@@ -128,6 +129,7 @@ func genericTransform(img image.Image, outImage *image.NRGBA, x0, y0, x1, y1 flo
 			}
 		}
 	})
+	outImage = dst
 }
 
 func imagingTransform(img image.Image, outImage *image.NRGBA, method TransformsMethod, x0, y0, x1, y1 float64, data []float64, filter ResampleFilter) {
@@ -183,7 +185,8 @@ func transformer(box [4]float64, image image.Image, outImage *image.NRGBA, metho
 		As := 1.0 / w
 		At := 1.0 / h
 		data =
-			[]float64{x0,
+			[]float64{
+				x0,
 				(ne[0] - x0) * As,
 				(sw[0] - x0) * At,
 				(se[0] - sw[0] - ne[0] + x0) * As * At,
