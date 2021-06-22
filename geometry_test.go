@@ -47,11 +47,11 @@ func TestMeshTransform(t *testing.T) {
 		log.Fatalf("failed to open image: %v", err)
 	}
 	w, h := src.Bounds().Dx(), src.Bounds().Dy()
-	meshq := make(map[[4]int][]float64)
+	meshq := make(map[[4]float64][]float64)
 
-	meshq[[4]int{0, 0, int(math.Round(float64(w) / 2)), int(math.Round(float64(h) / 2))}] = []float64{0, 0, 0, float64(h),
+	meshq[[4]float64{0, 0, float64(math.Round(float64(w) / 2)), float64(math.Round(float64(h) / 2))}] = []float64{0, 0, 0, float64(h),
 		float64(w), float64(h), float64(w), 0}
-	meshq[[4]int{int(math.Round(float64(w) / 2)), int(math.Round(float64(h) / 2)), w, h}] = []float64{0, 0, 0, float64(h),
+	meshq[[4]float64{float64(math.Round(float64(w) / 2)), float64(math.Round(float64(h) / 2)), float64(w), float64(h)}] = []float64{0, 0, 0, float64(h),
 		float64(w), float64(h), float64(w), 0}
 
 	dst := Transform(src, w, h, MESH, meshq, Box, true, color.Black)

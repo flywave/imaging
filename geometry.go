@@ -153,7 +153,7 @@ func filterApply(img image.Image, outImage []uint8, x, y float64, xw, yw [][]ind
 
 type ImagingTransformMap func(x, y float64, data []float64) (xout, yout float64)
 
-func genericTransform(img image.Image, outImage *image.NRGBA, x0, y0, x1, y1 int, transform ImagingTransformMap, data []float64, filter ResampleFilter, fill bool, fillColor color.Color) {
+func genericTransform(img image.Image, outImage *image.NRGBA, x0, y0, x1, y1 float64, transform ImagingTransformMap, data []float64, filter ResampleFilter, fill bool, fillColor color.Color) {
 	srcW := img.Bounds().Dx()
 	srcH := img.Bounds().Dy()
 
@@ -167,14 +167,14 @@ func genericTransform(img image.Image, outImage *image.NRGBA, x0, y0, x1, y1 int
 	if y0 < 0 {
 		y0 = 0
 	}
-	if x1 > srcW {
-		x1 = srcW
+	if x1 > float64(srcW) {
+		x1 = float64(srcW)
 	}
-	if y1 > srcH {
-		y1 = srcH
+	if y1 > float64(srcH) {
+		y1 = float64(srcH)
 	}
 
-	if x0 == 0 && y0 == 0 && srcW == x1 && srcH == y1 {
+	if x0 == 0 && y0 == 0 && float64(srcW) == x1 && float64(srcH) == y1 {
 		*outImage = *Clone(img)
 	}
 	dstW, dstH := int(x1-x0), int(y1-y0)
@@ -201,7 +201,7 @@ func genericTransform(img image.Image, outImage *image.NRGBA, x0, y0, x1, y1 int
 					scanLine[0], scanLine[1], scanLine[2], scanLine[3] = uint8(r), uint8(g), uint8(b), uint8(a)
 				}
 			}
-			j := y*outImage.Stride + int(x)*4
+			j := int(y)*outImage.Stride + int(x)*4
 			d := dst.Pix[j : j+4 : j+4]
 			copy(d, scanLine)
 		}
@@ -209,7 +209,7 @@ func genericTransform(img image.Image, outImage *image.NRGBA, x0, y0, x1, y1 int
 	outImage = dst
 }
 
-func imagingTransform(img image.Image, outImage *image.NRGBA, method TransformsMethod, x0, y0, x1, y1 int, data []float64, filter ResampleFilter, fill bool, fillColor color.Color) {
+func imagingTransform(img image.Image, outImage *image.NRGBA, method TransformsMethod, x0, y0, x1, y1 float64, data []float64, filter ResampleFilter, fill bool, fillColor color.Color) {
 	var transform ImagingTransformMap
 
 	switch method {
@@ -239,7 +239,7 @@ const (
 	MESH        TransformsMethod = 4
 )
 
-func transformer(box [4]int, image image.Image, outImage *image.NRGBA, method TransformsMethod, data []float64, filter ResampleFilter, fill bool, fillColor color.Color) {
+func transformer(box [4]float64, image image.Image, outImage *image.NRGBA, method TransformsMethod, data []float64, filter ResampleFilter, fill bool, fillColor color.Color) {
 	w := box[2] - box[0]
 	h := box[3] - box[1]
 
@@ -283,7 +283,7 @@ func Transform(dst image.Image, width, height int, method TransformsMethod, data
 	im := image.NewNRGBA(image.Rect(0, 0, width, height))
 
 	if method == MESH {
-		if qdata, ok := data.(map[[4]int][]float64); !ok {
+		if qdata, ok := data.(map[[4]float64][]float64); !ok {
 			return nil
 		} else {
 			for box, quad := range qdata {
@@ -291,7 +291,7 @@ func Transform(dst image.Image, width, height int, method TransformsMethod, data
 			}
 		}
 	} else {
-		transformer([4]int{0, 0, width, height}, dst, im, method, data.([]float64), filter, fill, fillcolor)
+		transformer([4]float64{0, 0, float64(width), float64(height)}, dst, im, method, data.([]float64), filter, fill, fillcolor)
 	}
 
 	return im
